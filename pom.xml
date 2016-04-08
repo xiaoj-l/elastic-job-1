@@ -232,6 +232,11 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-maven-plugin</artifactId>
+                    <version>9.3.0.M2</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
@@ -584,15 +589,21 @@
             <timezone>8</timezone>
         </developer>
     </developers>
-    
+
+
     <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>sonatype-nexus-releases</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <id>releases</id>
+            <name>Release Repository</name>
+            <url>http://nexus.corp.36kr.com/nexus/content/repositories/releases/
+            </url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Snapshot Repository</name>
+            <url>http://nexus.corp.36kr.com/nexus/content/repositories/snapshots/
+            </url>
+        </snapshotRepository>
     </distributionManagement>
+
 </project>
