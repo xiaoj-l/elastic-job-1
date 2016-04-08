@@ -1,58 +1,58 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-    <property name="log.directory" value="logs/" />
-    <property name="log.context.name" value="dd-job-console" />
-    <property name="log.charset" value="UTF-8" />
-    <property name="log.maxHistory" value="30" />
-    <property name="log.pattern" value="[%-5level] %date --%thread-- [%logger] %msg %n" />
-    <property name="log.error.log.level" value="WARN" />
-    <property name="log.async.queue.size" value="1024" />
-    
-    <include resource="includedLogbackConfig.xml" optional="true" />
-    <include resource="conf/includedLogbackConfig.xml" optional="true" />
-    
-    <contextName>${log.context.name}</contextName>
-    
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder charset="${log.charset}">
-            <pattern>${log.pattern}</pattern>
-        </encoder>
-    </appender>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <property name="LOG_STORE_DAYS" value="30"/>
+    <contextName>elastic-job-console</contextName>
+
+    <!-- 按照每天生成日志文件 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <file>${_LOG_HOME}/stdout.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log.directory}${log.context.name}-log.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>${log.maxHistory}</maxHistory>
+            <FileNamePattern>${_LOG_HOME}/stdout.log.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <MaxHistory>${LOG_STORE_DAYS}</MaxHistory>
         </rollingPolicy>
-        <encoder charset="${log.charset}">
-            <pattern>${log.pattern}</pattern>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+            <charset>UTF-8</charset>
         </encoder>
-    </appender>
-    
-    <!-- Asynchronized log, for FILE only -->
-    <appender name ="ASYNC_FILE" class= "ch.qos.logback.classic.AsyncAppender">
-        <!-- Don't discard log, logback will discard TRACE, DEBUG, INFO log when queue 80% capacity reached by default. -->
-        <discardingThreshold >0</discardingThreshold>
-        <queueSize>${log.async.queue.size}</queueSize>
-        <appender-ref ref = "FILE"/>
-    </appender>
-     
-    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-          <level>${log.error.log.level}</level>
+            <level>INFO</level>
         </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log.directory}${log.context.name}-error.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>${log.maxHistory}</maxHistory>
-        </rollingPolicy>
-        <encoder charset="${log.charset}">
-            <pattern>${log.pattern}</pattern>
-        </encoder>
     </appender>
-    
-    <root>
-        <level value="INFO" />
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="ASYNC_FILE" />
-        <appender-ref ref="ERROR" />
+
+    <!-- 按照每天生成error文件 -->
+    <appender name="ERRORFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <file>${_LOG_HOME}/elastic-job-console-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${_LOG_HOME}/elastic-job-console-error.log.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <MaxHistory>${LOG_STORE_DAYS}</MaxHistory>
+        </rollingPolicy>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 定制spring -->
+    <logger name="org.springframework" level="WARN" additivity="true">
+    </logger>
+
+    <!-- 定制mybatis -->
+    <logger name="org.mybatis" level="WARN" additivity="true">
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ERRORFILE"/>
     </root>
 </configuration>
