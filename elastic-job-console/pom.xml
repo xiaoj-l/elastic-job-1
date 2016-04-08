@@ -10,6 +10,7 @@
     <name>${project.artifactId}</name>
 
     <build>
+        <finalName>elastic-job-console</finalName>
         <plugins>
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
